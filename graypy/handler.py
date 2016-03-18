@@ -98,16 +98,17 @@ def make_message_dict(record, debugging_fields, extra_fields, fqdn, localname,
         host = localname
     else:
         host = socket.gethostname()
-    level = logging.getLevelName(record.levelno) if level_names \
-        else SYSLOG_LEVELS.get(record.levelno, record.levelno)
     fields = {'version': "1.0",
         'host': host,
         'short_message': record.getMessage(),
         'full_message': get_full_message(record.exc_info, record.getMessage()),
         'timestamp': record.created,
-        'level': level,
+        'level': SYSLOG_LEVELS.get(record.levelno, record.levelno)
         'facility': facility or record.name,
     }
+
+    if level_names:
+        fields['level_name'] = logging.getLevelName(record.levelno)
 
     if facility is not None:
         fields.update({
